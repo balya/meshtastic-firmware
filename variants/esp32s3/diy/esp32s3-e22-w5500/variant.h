@@ -1,7 +1,8 @@
 #pragma once
 
-// SX1262
+// SX1262 / SX1268
 #define USE_SX1262
+#define USE_SX1268
 #define SX126X_SCK 21
 #define SX126X_MOSI 38
 #define SX126X_MISO 39
@@ -30,11 +31,6 @@
 // Buzzer
 #define PIN_BUZZER 11
 
-// Battery
-#define BATTERY_PIN -1
-#define ADC_CHANNEL ADC1_GPIO1_CHANNEL
-#define BATTERY_SENSE_RESOLUTION_BITS 12
-
 // RGB LED
 #define ENABLE_AMBIENTLIGHTING
 #define HAS_NEOPIXEL
@@ -52,16 +48,10 @@
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 
-// GPS
-// #define HAS_GPS 1
-// #define PIN_GPS_EN 15
-// #define GPS_EN_ACTIVE 1
-// #define GPS_TX_PIN 16
-// #define GPS_RX_PIN 17
-
 // Ethernet
 #define HAS_ETHERNET 1
-#define USE_WS5500 1
+#define USE_WS5500 1 // This driver uses the same stack as the ESP32 WiFi driver.
+#define USE_ETHERNET_DEFAULT 1
 #define ETH_ADDR 1
 #define ETH_MISO_PIN 4
 #define ETH_MOSI_PIN 5
