@@ -1,5 +1,8 @@
 #pragma once
 
+// Button
+#define BUTTON_PIN 0 // BOOT button
+
 // SX1262 / SX1268
 #define USE_SX1262
 #define USE_SX1268
@@ -43,10 +46,20 @@
 #define I2C_SDA 8
 
 // OLED
+#if !defined(MESHTASTIC_EXCLUDE_SCREEN)
 #define HAS_SCREEN 1
 #define USE_SSD1306
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
+#endif
+
+// E-Ink display
+#define PIN_EINK_BUSY 1
+#define PIN_EINK_SCLK LORA_SCK
+#define PIN_EINK_MOSI LORA_MOSI
+#define PIN_EINK_CS 15
+#define PIN_EINK_DC 16
+#define PIN_EINK_RES 17
 
 // Ethernet
 #define HAS_ETHERNET 1
