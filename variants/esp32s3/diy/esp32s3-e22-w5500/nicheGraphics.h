@@ -4,7 +4,9 @@
 
 #ifdef MESHTASTIC_INCLUDE_NICHE_GRAPHICS
 
+#include "GDEY037T03.h"
 #include "graphics/niche/Drivers/EInk/HINK_E0213A289.h"
+#include "graphics/niche/Drivers/EInk/ZJY128296_029EAAMFGN.h"
 #include "graphics/niche/InkHUD/InkHUD.h"
 
 #include "graphics/niche/InkHUD/Applets/User/AllMessage/AllMessageApplet.h"
@@ -16,6 +18,10 @@
 #include "graphics/niche/InkHUD/Applets/User/ThreadedMessage/ThreadedMessageApplet.h"
 #include "graphics/niche/Inputs/TwoButton.h"
 
+#if !defined(INKHUD_BUILDCONF_DRIVER) || !defined(INKHUD_BUILDCONF_DISPLAYRESILIENCE) || !defined(INKHUD_BUILDCONF_MAX_TILES)
+#error InkHUD display model, resilience, and tile count must be selected by the PlatformIO environment
+#endif
+
 void setupNicheGraphics()
 {
     using namespace NicheGraphics;
@@ -26,19 +32,19 @@ void setupNicheGraphics()
     pinMode(PIN_EINK_CS, OUTPUT);
     digitalWrite(PIN_EINK_CS, HIGH);
 
-    Drivers::EInk *driver = new Drivers::HINK_E0213A289;
+    Drivers::EInk *driver = new Drivers::INKHUD_BUILDCONF_DRIVER;
     driver->begin(&SPI, PIN_EINK_DC, PIN_EINK_CS, PIN_EINK_BUSY, PIN_EINK_RES);
 
     InkHUD::InkHUD *inkhud = InkHUD::InkHUD::getInstance();
     inkhud->setDriver(driver);
-    inkhud->setDisplayResilience(10);
+    inkhud->setDisplayResilience(INKHUD_BUILDCONF_DISPLAYRESILIENCE);
 
     InkHUD::Applet::fontLarge = FREESANS_12PT_WIN1251;
     InkHUD::Applet::fontMedium = FREESANS_9PT_WIN1251;
     InkHUD::Applet::fontSmall = FREESANS_6PT_WIN1251;
 
-    inkhud->persistence->settings.rotation = 1;
-    inkhud->persistence->settings.userTiles.maxCount = 2;
+    inkhud->persistence->settings.rotation = driver->height > driver->width ? 1 : 0;
+    inkhud->persistence->settings.userTiles.maxCount = INKHUD_BUILDCONF_MAX_TILES;
     inkhud->persistence->settings.userTiles.count = 1;
     inkhud->persistence->settings.optionalFeatures.batteryIcon = true;
 
