@@ -63,9 +63,6 @@ class GDEY037T03 : public EInk
             initDisplay();
             writeImage(0x10);
         }
-
-        sendCommand(0x07);
-        sendData(0xA5);
     }
 
   private:
