@@ -1,7 +1,9 @@
 #pragma once
 
 // Button
+#if !defined(E22_W5500_NO_BASEUI_BUTTON_PIN)
 #define BUTTON_PIN 0 // BOOT button
+#endif
 
 // SX1262 / SX1268
 #define USE_SX1262
