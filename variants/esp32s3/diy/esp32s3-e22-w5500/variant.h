@@ -29,9 +29,9 @@
 #define LORA_RESET SX126X_RESET
 
 // LED
-// #define LED_POWER 1
-// #define LED_STATE_ON 1
-// #define EXT_NOTIFY_OUT 2
+#define LED_POWER 13
+#define LED_LORA 2
+#define LED_STATE_ON 1
 
 // Buzzer
 #define PIN_BUZZER 11
