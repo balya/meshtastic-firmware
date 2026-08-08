@@ -3,6 +3,9 @@
 // Button
 #if !defined(E22_W5500_NO_BASEUI_BUTTON_PIN)
 #define BUTTON_PIN 0 // BOOT button
+#else
+#undef HAS_BUTTON
+#define HAS_BUTTON 1
 #endif
 
 // SX1262 / SX1268

@@ -6,6 +6,7 @@
 
 #include "GDEY037T03.h"
 #include "graphics/niche/Drivers/EInk/HINK_E0213A289.h"
+#include "graphics/niche/Drivers/EInk/HINK_E042A87.h"
 #include "graphics/niche/Drivers/EInk/ZJY128296_029EAAMFGN.h"
 #include "graphics/niche/InkHUD/InkHUD.h"
 
