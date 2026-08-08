@@ -9,6 +9,7 @@
 #include "graphics/niche/Drivers/EInk/HINK_E042A87.h"
 #include "graphics/niche/Drivers/EInk/ZJY128296_029EAAMFGN.h"
 #include "graphics/niche/InkHUD/InkHUD.h"
+#include "graphics/niche/InkHUD/SystemApplet.h"
 
 #include "graphics/niche/InkHUD/Applets/User/AllMessage/AllMessageApplet.h"
 #include "graphics/niche/InkHUD/Applets/User/DM/DMApplet.h"
@@ -18,9 +19,78 @@
 #include "graphics/niche/InkHUD/Applets/User/RecentsList/RecentsListApplet.h"
 #include "graphics/niche/InkHUD/Applets/User/ThreadedMessage/ThreadedMessageApplet.h"
 #include "graphics/niche/Inputs/TwoButton.h"
+#if !MESHTASTIC_EXCLUDE_INPUTBROKER
+#include "input/InputBroker.h"
+#include "input/RotaryEncoderInterruptBase.h"
+#endif
 
 #if !defined(INKHUD_BUILDCONF_DRIVER) || !defined(INKHUD_BUILDCONF_DISPLAYRESILIENCE) || !defined(INKHUD_BUILDCONF_MAX_TILES)
 #error InkHUD display model, resilience, and tile count must be selected by the PlatformIO environment
+#endif
+
+#if !MESHTASTIC_EXCLUDE_INPUTBROKER
+class E22W5500RotaryEncoder : public RotaryEncoderInterruptBase
+{
+  public:
+    E22W5500RotaryEncoder() : RotaryEncoderInterruptBase("rotEnc1") { instance = this; }
+
+    void begin()
+    {
+        RotaryEncoderInterruptBase::init(E22_W5500_ROTARY_A, E22_W5500_ROTARY_B, E22_W5500_ROTARY_PRESS, INPUT_BROKER_RIGHT,
+                                         INPUT_BROKER_LEFT, INPUT_BROKER_SELECT, INPUT_BROKER_SELECT_LONG, handleA, handleB,
+                                         handlePress);
+        inputBroker->registerSource(this);
+    }
+
+  private:
+    inline static E22W5500RotaryEncoder *instance = nullptr;
+
+    static void handleA() { instance->intAHandler(); }
+    static void handleB() { instance->intBHandler(); }
+    static void handlePress() { instance->intPressHandler(); }
+};
+
+class E22W5500InkHUDRotaryBridge : public Observer<const InputEvent *>
+{
+  protected:
+    int onNotify(const InputEvent *event) override
+    {
+        NicheGraphics::InkHUD::InkHUD *inkhud = NicheGraphics::InkHUD::InkHUD::getInstance();
+
+        switch (event->inputEvent) {
+        case INPUT_BROKER_LEFT:
+            if (systemAppletHasInput(inkhud))
+                inkhud->touchNavUp();
+            else
+                inkhud->prevApplet();
+            break;
+        case INPUT_BROKER_RIGHT:
+            if (systemAppletHasInput(inkhud))
+                inkhud->touchNavDown();
+            else
+                inkhud->nextApplet();
+            break;
+        case INPUT_BROKER_SELECT:
+        case INPUT_BROKER_SELECT_LONG:
+            inkhud->longpress();
+            break;
+        default:
+            break;
+        }
+
+        return 0;
+    }
+
+  private:
+    static bool systemAppletHasInput(const NicheGraphics::InkHUD::InkHUD *inkhud)
+    {
+        for (const NicheGraphics::InkHUD::SystemApplet *applet : inkhud->systemApplets) {
+            if (applet->handleInput)
+                return true;
+        }
+        return false;
+    }
+};
 #endif
 
 void setupNicheGraphics()
@@ -59,6 +129,16 @@ void setupNicheGraphics()
     inkhud->addApplet("Heard", new InkHUD::HeardApplet, true, false, 0);
 
     inkhud->begin();
+
+#if !MESHTASTIC_EXCLUDE_INPUTBROKER
+    // Keep encoder directions aligned with the displayed orientation.
+    inkhud->persistence->settings.joystick.alignment = (4 - inkhud->persistence->settings.rotation) % 4;
+
+    static E22W5500RotaryEncoder rotaryEncoder;
+    static E22W5500InkHUDRotaryBridge rotaryBridge;
+    rotaryEncoder.begin();
+    rotaryBridge.observe(&rotaryEncoder);
+#endif
 
     Inputs::TwoButton *buttons = Inputs::TwoButton::getInstance();
     buttons->setWiring(0, Inputs::TwoButton::getUserButtonPin(), true);

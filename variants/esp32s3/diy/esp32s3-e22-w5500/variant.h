@@ -66,6 +66,11 @@
 #define PIN_EINK_DC 16
 #define PIN_EINK_RES 17
 
+// Rotary encoder
+#define E22_W5500_ROTARY_A 43
+#define E22_W5500_ROTARY_B 3
+#define E22_W5500_ROTARY_PRESS 46
+
 // Ethernet
 #define HAS_ETHERNET 1
 #define USE_WS5500 1 // This driver uses the same stack as the ESP32 WiFi driver.
